@@ -1,0 +1,10 @@
+services:
+        pretrain:
+                image: nuneslu/depthcontrast:latest
+                runtime: nvidia
+                environment:
+                      - NVIDIA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES
+                volumes: 
+                      - $PWD:/home/DepthContrast
+                      - $PWD/Datasets/:/home/DepthContrast/Datasets
+
