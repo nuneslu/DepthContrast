@@ -11,12 +11,12 @@ import numpy as np
 
 from datasets.transforms.augment3d import get_transform3d
 
-try:
+#try:
     ### Default uses minkowski engine
-    from datasets.transforms.voxelizer import Voxelizer
-    from datasets.transforms import transforms
-except:
-    pass
+from datasets.transforms.voxelizer import Voxelizer
+from datasets.transforms import transforms
+#except:
+#    pass
     
 try:
     try:
@@ -28,6 +28,7 @@ except:
 
 from torch.utils.data import Dataset
 import torch
+import MinkowskiEngine as ME
 
 ### Waymo lidar range
 #POINT_RANGE = np.array([  0. , -75. ,  -3. ,  75.0,  75. ,   3. ], dtype=np.float32)
@@ -49,15 +50,15 @@ class DepthContrastDataset(Dataset):
         self.AUGMENT_COORDS_TO_FEATS = False #optional
         self._labels_init = False
         self._get_data_files("train")
-        self.data_objs = np.load(self.data_paths[0]) ### Only load the first one for now
+        self.data_objs = np.fromfile(self.data_paths[0], dtype=np.float32)#np.load(self.data_paths[0]) ### Only load the first one for now
 
         #### Add the voxelizer here
         if ("Lidar" in cfg) and cfg["VOX"]:
-            self.VOXEL_SIZE = [0.1, 0.1, 0.2]
+            self.VOXEL_SIZE = [0.05, 0.05, 0.05]
        
             self.point_cloud_range = POINT_RANGE#np.array([  0. , -75. ,  -3. ,  75.0,  75. ,   3. ], dtype=np.float32)
             self.MAX_POINTS_PER_VOXEL = 5
-            self.MAX_NUMBER_OF_VOXELS = 16000
+            self.MAX_NUMBER_OF_VOXELS = 40000
             self.voxel_generator = VoxelGenerator(
                 voxel_size=self.VOXEL_SIZE,
                 point_cloud_range=self.point_cloud_range,
@@ -111,7 +112,14 @@ class DepthContrastDataset(Dataset):
     def _get_data_files(self, split):
         local_rank = int(os.environ.get("LOCAL_RANK", 0))
 
-        self.data_paths = self.cfg["DATA_PATHS"]
+        self.data_paths = []
+
+        seqs = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
+
+        for seq in seqs:
+            for data_file in os.listdir(os.path.join(self.cfg['DATA_PATHS'][0], 'dataset', 'sequences', seq, 'velodyne')):
+                self.data_paths.append(os.path.join(self.cfg['DATA_PATHS'][0], 'dataset', 'sequences', seq, 'velodyne', data_file))
+
         self.label_paths = []
         
         logging.info(f"Rank: {local_rank} Data files:\n{self.data_paths}")
@@ -145,6 +153,7 @@ class DepthContrastDataset(Dataset):
             if (self.split == "TRAIN") and (self.prevoxel_transform is not None):
                 coords, feats, labels = self.prevoxel_transform(coords, feats, labels)
             coords, feats, labels, transformation = self.voxelizer.voxelize(coords, feats, labels)
+            coords -= coords.min(0, keepdims=1)
             if (self.split == "TRAIN") and (self.input_transforms is not None):
                 try:
                     coords, feats, labels = self.input_transforms(coords, feats, labels)
@@ -159,9 +168,9 @@ class DepthContrastDataset(Dataset):
 
     def load_data(self, idx):
         is_success = True
-        point_path = self.data_objs[idx]
+        point_path = self.data_paths[idx]
         try:
-            if "Lidar" in self.cfg:
+            if "Lidar" not in self.cfg:
                 #point = np.load(point_path)
                 point = np.fromfile(str(point_path), dtype=np.float32).reshape(-1, 4)#np.load(point_path)
                 if point.shape[1] != 4:
@@ -227,14 +236,15 @@ class DepthContrastDataset(Dataset):
             tempitem = {"data": item["vox"]}
             tempdata = get_transform3d(tempitem, cfg["POINT_TRANSFORMS"], vox=True)
             coords = tempdata["data"][0][:,:3]
-            feats = tempdata["data"][0][:,3:6]*255.0#np.ones(coords.shape)*255.0
+            # semantickitti only intesity
+            feats = tempdata["data"][0][:,:]#np.ones(coords.shape)*255.0
             labels = np.zeros(coords.shape[0]).astype(np.int32)
             item["vox"] = [self.toVox(coords, feats, labels)]
             
             tempitem = {"data": item["vox_moco"]}
             tempdata = get_transform3d(tempitem, cfg["POINT_TRANSFORMS"], vox=True)
             coords = tempdata["data"][0][:,:3]
-            feats = tempdata["data"][0][:,3:6]*255.0#np.ones(coords.shape)*255.0
+            feats = tempdata["data"][0][:,:]#np.ones(coords.shape)*255.0
             labels = np.zeros(coords.shape[0]).astype(np.int32)                    
             item["vox_moco"] = [self.toVox(coords, feats, labels)]               
         else:

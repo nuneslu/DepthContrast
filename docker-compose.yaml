@@ -2,6 +2,7 @@ services:
         pretrain:
                 image: nuneslu/depthcontrast:latest
                 runtime: nvidia
+                privileged: True
                 environment:
                       - NVIDIA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES
                 volumes: 

@@ -21,12 +21,16 @@ try:
 except:
     PointNet2MSG = None
     UNetV2 = None
+
+from models.trunks.minkunet import MinkUNet, MinkUNetSMLP
     
 TRUNKS = {
     "pointnet": PointNet,
     "unet": Res16UNet34,
     "pointnet_msg": PointNet2MSG,
     "UNetV2": UNetV2,
+    "MinkUNet": MinkUNet,
+    "MinkUNetSMLP": MinkUNetSMLP,
 }
 
 

@@ -68,7 +68,7 @@ def recursive_copy_to_gpu(value, non_blocking=True, max_depth=3, curr_depth=0):
         try:
             return value.cuda(non_blocking=non_blocking)
         except:
-            return value.to(torch.device('cuda'))
+            return value#.to(torch.device('cuda'))
     except AttributeError:
         if isinstance(value, container_abcs.Sequence):
             gpu_val = []

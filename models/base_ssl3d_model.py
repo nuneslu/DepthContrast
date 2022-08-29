@@ -22,6 +22,7 @@ except:
 import numpy as np
 
 from utils import main_utils
+import MinkowskiEngine as ME
 
 def parameter_description(model):
     desc = ''
@@ -91,7 +92,7 @@ class BaseSSLMultiInputOutputModel(nn.Module):
             points_coords[:, 1:] += (torch.rand(3) * 100).type_as(points_coords)
             points_feats = points_feats/255.0 - 0.5
 
-            batch = SparseTensor(points_feats, points_coords.float())
+            batch = ME.SparseTensor(features=points_feats, coordinates=points_coords, device=torch.device('cuda'))
 
         if ('vox' in input_key) and ("Lidar" in self.config):
             # Copy to GPU
@@ -209,7 +210,7 @@ class BaseSSLMultiInputOutputModel(nn.Module):
             points_coords[:, 1:] += (torch.rand(3) * 100).type_as(points_coords)
             points_feats = points_feats/255.0 - 0.5
             ### If enable shuffle batch for vox, please comment out this line.
-            batch = SparseTensor(points_feats, points_coords.float())
+            batch = ME.SparseTensor(features=points_feats, coordinates=points_coords, device=torch.device('cuda'))
 
         with torch.no_grad():
             self._momentum_update_key(target)  # update the key encoder
@@ -238,12 +239,12 @@ class BaseSSLMultiInputOutputModel(nn.Module):
                     
                         points_coords, idx_unshuffle, idx_shuffle = self._batch_shuffle_ddp(point_coord_split, vox=True)
                         points_feats, _, _ = self._batch_shuffle_ddp(point_feat_split, vox=True, idx_shuffle=idx_shuffle)
-                        batch = SparseTensor(points_feats, points_coords.float())
+                        batch = ME.SparseTensor(features=points_feats, coordinates=points_coords, device=torch.device('cuda'))
                     else:
                         print ("Not implemented yet")    
             else:
                 if ('vox' in input_key) and ("Lidar" not in self.config):
-                    batch = SparseTensor(points_feats, points_coords.float())
+                    batch = ME.SparseTensor(features=points_feats, coordinates=points_coords, device=torch.device('cuda'))
                 
             # Copy to GPU
             if ("Lidar" in self.config) and ("vox" in input_key):

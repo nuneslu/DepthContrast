@@ -19,7 +19,7 @@ RUN rm /etc/apt/sources.list.d/cuda.list
 RUN rm /etc/apt/sources.list.d/nvidia-ml.list
 RUN apt-get update
 RUN apt-get install -y git ninja-build cmake build-essential libopenblas-dev \
-    xterm xauth openssh-server tmux wget mate-desktop-environment-core
+    xterm xauth openssh-server tmux wget mate-desktop-environment-core vim
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*

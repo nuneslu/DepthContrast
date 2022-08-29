@@ -11,7 +11,7 @@ import MinkowskiEngine as ME
 
 class SMLP(nn.Module):
     def __init__(
-        self, dims, use_bn=False, use_relu=False, use_dropout=False, use_bias=True
+        self, dims, use_bn=False, use_relu=True, use_dropout=False, use_bias=True
     ):
         super().__init__()
         layers = []
