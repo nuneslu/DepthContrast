@@ -208,7 +208,7 @@ class BaseSSLMultiInputOutputModel(nn.Module):
 
             ### Invariant to even and odd coords
             points_coords[:, 1:] += (torch.rand(3) * 100).type_as(points_coords)
-            points_feats = points_feats/255.0 - 0.5
+            #points_feats = points_feats/255.0 - 0.5
             ### If enable shuffle batch for vox, please comment out this line.
             batch = ME.SparseTensor(features=points_feats, coordinates=points_coords, device=torch.device('cuda'))
 
