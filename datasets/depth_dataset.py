@@ -271,13 +271,13 @@ class DepthContrastDataset(Dataset):
         return item
 
     def __len__(self):
-        return len(self.data_objs)
+        return len(self.data_paths)
 
     def get_available_splits(self, dataset_config):
         return [key for key in dataset_config if key.lower() in ["train", "test"]]
 
     def num_samples(self, source_idx=0):
-        return len(self.data_objs)
+        return len(self.data_paths)
 
     def get_batchsize_per_replica(self):
         # this searches for batchsize_per_replica in self and then in self.dataset

@@ -15,7 +15,7 @@ print_freq: 5
 dataset:
   DATASET_NAMES: [semantickitti]
   DATA_PATHS: ['./Datasets/SemanticKITTI']
-  BATCHSIZE_PER_REPLICA: 32
+  BATCHSIZE_PER_REPLICA: 16
   LABEL_TYPE: sample_index
   DATA_TYPE: point_vox
   #Lidar: True
