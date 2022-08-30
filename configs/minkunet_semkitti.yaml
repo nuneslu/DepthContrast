@@ -15,7 +15,7 @@ print_freq: 5
 dataset:
   DATASET_NAMES: [semantickitti]
   DATA_PATHS: ['./Datasets/SemanticKITTI']
-  BATCHSIZE_PER_REPLICA: 16
+  BATCHSIZE_PER_REPLICA: 32
   LABEL_TYPE: sample_index
   DATA_TYPE: point_vox
   #Lidar: True
@@ -41,7 +41,7 @@ optimizer:
   weight_decay: 0.0001
   momentum: 0.9
   nesterov: False
-  num_epochs: 1000
+  num_epochs: 200
   lr:
     name: "cosine"
     base_lr: 0.12
