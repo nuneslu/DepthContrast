@@ -15,7 +15,7 @@ print_freq: 5
 dataset:
   DATASET_NAMES: [semantickitti]
   DATA_PATHS: ['./Datasets/SemanticKITTI']
-  BATCHSIZE_PER_REPLICA: 2
+  BATCHSIZE_PER_REPLICA: 16
   LABEL_TYPE: sample_index
   DATA_TYPE: point_vox
   #Lidar: True
@@ -76,5 +76,5 @@ loss:
       NORM_EMBEDDING: True
       TEMPERATURE: 0.1
       LOSS_TYPE: cross_entropy
-      NUM_NEGATIVES: 131072
+      NUM_NEGATIVES: 8192
       EMBEDDING_DIM: 128

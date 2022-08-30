@@ -183,6 +183,8 @@ def run_phase(phase, loader, model, optimizer, criterion, epoch, args, cfg, logg
         if (i+1) % cfg['print_freq'] == 0 or i == 0 or i+1 == len(loader):
             progress.display(i+1)
 
+        torch.cuda.empty_cache()
+
     # Sync metrics across all GPUs and print final averages
     if args.multiprocessing_distributed:
         progress.synchronize_meters(args.gpu)
